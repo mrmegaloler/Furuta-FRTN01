@@ -7,7 +7,7 @@ public class SimFurutaPendulum {
 	// Creates and starts a new process simulation, with initial
 	// pendulum angle theta0 and arm angle phi0 (in radians)
 	public SimFurutaPendulum(double theta0, double phi0){
-		
+
 	}
 
 	// Returns the pendulum angle (in radians)
