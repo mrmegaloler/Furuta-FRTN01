@@ -8,6 +8,8 @@ J = 0.05;
 m = 0.02;
 g = 9.81;
 
+sampling_time = 0.001;
+
 alfa = Jp+M*l^2;
 beta = J+M*r^2+m*r^2;
 gamma = M*r*l;
@@ -20,12 +22,9 @@ friction = 0.2;  % Added viscous friction compared to Åkesson (1999)
 % Linear model for control in the upper position
 
 %declaration of q and r for lqr, alternative 2
-Q = [20 0 0 0; 
-    0 3 0 0;
-    0 0 3 0;
-    0 0 0 4]
+Q = diag([80, 2, 10, 2])
 
-R = 1*eye(1); 
+R = [20] ;
 
 A_upper = [-friction 1 0 0;
      (beta*epsilon)/(alfa*beta-gamma^2) 0 0 0;
@@ -42,23 +41,29 @@ A_lower = [-friction 1 0 0;
 B_lower = [0 gamma/(alfa*beta-gamma^2)*g 0 alfa/(alfa*beta-gamma^2)*g]';
 
 %code for generating the lqr filter
-[K,S,E] = lqrd(A_lower,B_lower,Q,R)
+[K,S,E] = lqrd(A_upper,B_upper,Q,R,sampling_time)
 
 %code to check the poles generated
-g = zpk(1,[E(1,1),E(2,1),E(3,1),E(4,1)],1,0.01);
+%g = zpk(1,[E(1,1),E(2,1),E(3,1),E(4,1)],1,0.01);
 
-pole(d2c(G))
+%pole(d2c(g));
 
 %code for generating by pole placement, alternative 1
 
-%[A,B] = c2d(A_lower,B_lower,0.01);
+[A,B] = c2d(A_upper,B_upper,0.01);
 
-%p1_l = exp(-6*cosd(20)+6*sind(20)*i);
-%p2_l = exp(-6*cosd(20)-6*sind(20)*i);
-%p3_l = exp(-22);
-%p4_l = exp(-1);
+p1_l = exp((-6*cosd(45)+6*sind(20)*i)*sampling_time);
+p2_l = exp((-6*cosd(45)-6*sind(20)*i)*sampling_time);
+p3_l = exp(-22*sampling_time);
+p4_l = exp(-1*sampling_time);
 
 %[K, PREC,message] = place(A,B,[p1_l,p2_l,p3_l,p4_l])
+
+sys = c2d(ss(A_upper,B_upper,eye(4), 0), 0.01);
+sys_feedback = feedback(sys, K);
+step(sys_feedback)
+
+
 
 
 
