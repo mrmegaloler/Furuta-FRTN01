@@ -65,10 +65,7 @@ public class FurutaRegulator extends Thread {
 
 		}
 	}
-<<<<<<< HEAD
-=======
-	}
->>>>>>> master
+
 
 	public double normalizeToPi(double angle){
 		while (angle > Math.PI)
