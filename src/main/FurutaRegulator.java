@@ -28,10 +28,10 @@ public class FurutaRegulator extends Thread {
 				double u = 0;
 				if(furuta.getThetaAngle()< 0.1 && furuta.getThetaAngle() >-0.1) {
 					u = (furuta.getThetaAngle() % (2 * Math.PI)) * -13.6884 + (furuta.getThetaDot()) * -2.4937+
-						(furuta.getPhiAngle() % (2 * Math.PI)) * -0.5757 + furuta.getPhiDot() * -0.5382;
+							(furuta.getPhiAngle() % (2 * Math.PI)) * -0.5757 + furuta.getPhiDot() * -0.5382;
 				} else{
-					u = 1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(furuta.getThetaDot(),2)/(2*Math.pow(6.7,2)) ))-1)
-							*furuta.getThetaDot()*Math.cos(furuta.getThetaAngle())) - 0*furuta.getPhiAngle();
+					u = 0.4 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(furuta.getThetaDot(),2)/(2*Math.pow(6.7,2)) ))-1)
+							*furuta.getThetaDot()*Math.cos(furuta.getThetaAngle())) - 0.05*furuta.getPhiDot();
 				}
 				/*
 				else if (furuta.getThetaAngle()< 0.8+Math.PI && furuta.getThetaAngle() >-0.8+Math.PI) {
@@ -51,7 +51,7 @@ public class FurutaRegulator extends Thread {
 				if (u > 1) {
 					u = 1;
 				} else if (u < -1) {
-					u = 1;
+					u = -1;
 				}
 				furuta.setControlSignal(u);
 				duration = t - System.currentTimeMillis();
@@ -64,5 +64,14 @@ public class FurutaRegulator extends Thread {
 		} catch (Exception ignored) {
 
 		}
+	}
+
+	public double normalizeToPi(double angle){
+		while (angle > Math.PI)
+			angle -= 2 * Math.PI;
+		while (angle < -Math.PI)
+			angle += 2 * Math.PI;
+
+		return angle;
 	}
 }
