@@ -50,10 +50,10 @@ B_lower = [0 gamma/(alfa*beta-gamma^2)*g 0 alfa/(alfa*beta-gamma^2)*g]';
 
 %code for generating by pole placement, alternative 1
 
-[A,B] = c2d(A_upper,B_upper,0.01);
+[A,B] = c2d(A_upper,B_upper,0.001);
 
-p1_l = exp((-6*cosd(45)+6*sind(20)*i)*sampling_time);
-p2_l = exp((-6*cosd(45)-6*sind(20)*i)*sampling_time);
+p1_l = exp((-6*cosd(20)+6*sind(20)*i)*sampling_time);
+p2_l = exp((-6*cosd(20)-6*sind(20)*i)*sampling_time);
 p3_l = exp(-22*sampling_time);
 p4_l = exp(-1*sampling_time);
 
