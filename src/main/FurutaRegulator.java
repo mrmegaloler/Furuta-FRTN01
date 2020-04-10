@@ -24,11 +24,13 @@ public class FurutaRegulator extends Thread {
 				long t = System.currentTimeMillis();
 				t = t + h;
 
-				System.out.println(furuta.getThetaAngle());
+				//System.out.println(furuta.getThetaAngle());
 				double u = 0;
-				if(furuta.getThetaAngle()< 0.1 && furuta.getThetaAngle() >-0.1) {
-					u = (furuta.getThetaAngle() % (2 * Math.PI)) * -13.6884 + (furuta.getThetaDot()) * -2.4937+
-							(furuta.getPhiAngle() % (2 * Math.PI)) * -0.5757 + furuta.getPhiDot() * -0.5382;
+				if(normalizeToPi(furuta.getThetaAngle())< 0.05 && normalizeToPi(furuta.getThetaAngle()) >-0.05) {
+					u = (normalizeToPi(furuta.getThetaAngle())) * 13.6884 + (furuta.getThetaDot()) * 2.4937+
+							(normalizeToPi(furuta.getPhiAngle())) * 0.5757 + furuta.getPhiDot() * 0.5382;
+					System.out.println("Stabilizing");
+					System.out.println(normalizeToPi(furuta.getThetaAngle()));
 				} else{
 					u = 0.4 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(furuta.getThetaDot(),2)/(2*Math.pow(6.7,2)) ))-1)
 							*furuta.getThetaDot()*Math.cos(furuta.getThetaAngle())) - 0.05*furuta.getPhiDot();
@@ -66,12 +68,13 @@ public class FurutaRegulator extends Thread {
 		}
 	}
 
-
 	public double normalizeToPi(double angle){
-		while (angle > Math.PI)
-			angle -= 2 * Math.PI;
-		while (angle < -Math.PI)
-			angle += 2 * Math.PI;
+		if (angle > Math.PI){
+			angle = (angle % (2 * Math.PI));
+			if(angle > Math.PI){
+				angle -= 2*Math.PI;
+			}
+		}
 
 		return angle;
 	}
