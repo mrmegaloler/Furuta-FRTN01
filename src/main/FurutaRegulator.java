@@ -8,6 +8,8 @@ public class FurutaRegulator extends Thread {
 	private SimFurutaPendulum furuta;
 	private double controlSignal = 0.8;
 
+
+
 	enum STATE {UPPER, LOWER, OFF}; //Lokalt definierat för att hålla koll på hur vi ska reglera
 
 
@@ -25,18 +27,22 @@ public class FurutaRegulator extends Thread {
 		long duration;
 		double u = 0;
 
+		double pastAngle = furuta.getThetaAngle();
+
+
+
 		try {
 			while (!Thread.interrupted()) {
 				long t = System.currentTimeMillis();
 				t = t + h;
-
+				System.out.println(furuta.getPhiAngle());
 				if (state == STATE.UPPER) {
-
+					double thetaDot = (furuta.getThetaAngle() - pastAngle)/0.001;
 					if (normalizeToPiUpper(furuta.getThetaAngle()) < 0.15 && normalizeToPiUpper(furuta.getThetaAngle()) > -0.15) {
 						//Stabiliseringsalgoritm övre
 						//Vi använder styrlagen att u = K*(Xref-X)
-						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -18.67 + (furuta.getThetaDot()) * 3.4 +
-								(Math.PI - (normalizeToPiUpper(furuta.getPhiAngle()))) * -0.8 + furuta.getPhiDot() * 0.74;
+						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -18.67 + (thetaDot) * 3.4 +
+								(2 - ((furuta.getPhiAngle()))) * -0.8 + furuta.getPhiDot() * 0.74;
 					} else {
 						//Swing-up algoritm
 						//Taget från webbsidan
@@ -61,7 +67,7 @@ public class FurutaRegulator extends Thread {
 				}
 				furuta.setControlSignal(u);
 				duration = t - System.currentTimeMillis();
-
+				pastAngle = furuta.getThetaAngle();
 				if (duration > 0) {
 					sleep(duration);
 				}
