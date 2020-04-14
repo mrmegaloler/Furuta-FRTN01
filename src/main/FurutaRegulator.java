@@ -36,18 +36,18 @@ public class FurutaRegulator extends Thread {
 				t = t + h;
 				System.out.println(furuta.getPhiAngle());
 				if (state == STATE.UPPER) {
-					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.001;
-					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.001;
-					if (normalizeToPiUpper(furuta.getThetaAngle()) < 0.15 && normalizeToPiUpper(furuta.getThetaAngle()) > -0.15) {
+					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.01;
+					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
+					if (normalizeToPiUpper(furuta.getThetaAngle()) < 0.2 && normalizeToPiUpper(furuta.getThetaAngle()) > -0.15) {
 						//Stabiliseringsalgoritm övre
 						//Vi använder styrlagen att u = K*(Xref-X)
-						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -18.67 + (thetaDot) * 3.4 +
-								(2 - ((furuta.getPhiAngle()))) * -0.8 + phiDot * 0.74;
+						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
+								(Math.PI - ((furuta.getPhiAngle()))) * -0.5988 + phiDot * 0.7628;
 					} else {
 						//Swing-up algoritm
 						//Taget från webbsidan
-						u = 1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(furuta.getThetaDot(), 2) / (2 * Math.pow(6.7, 2)))) - 1)
-								* furuta.getThetaDot() * Math.cos(furuta.getThetaAngle())) - 0.02 * phiDot;
+						u = 1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
+								* thetaDot * Math.cos(furuta.getThetaAngle())) - 0.02 * phiDot;
 					}
 
 				} else if (state == STATE.LOWER) {
