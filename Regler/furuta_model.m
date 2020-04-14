@@ -8,7 +8,7 @@ J = 0.05;
 m = 0.02;
 g = 9.81;
 
-sampling_time = 0.001;
+sampling_time = 0.05;
 
 alfa = Jp+M*l^2;
 beta = J+M*r^2+m*r^2;
@@ -22,9 +22,9 @@ friction = 0.2;  % Added viscous friction compared to Åkesson (1999)
 % Linear model for control in the upper position
 
 %declaration of q and r for lqr, alternative 2
-Q = diag([80, 2, 10, 2])
+Q = diag([100, 20, 40, 20])
 
-R = [20] ;
+R = [5] ;
 
 A_upper = [-friction 1 0 0;
      (beta*epsilon)/(alfa*beta-gamma^2) 0 0 0;
@@ -59,11 +59,12 @@ p4_l = exp(-1*sampling_time);
 
 %[K, PREC,message] = place(A,B,[p1_l,p2_l,p3_l,p4_l])
 
-sys = c2d(ss(A_upper,B_upper,eye(4), 0), 0.01);
+sys = c2d(ss(A_upper,B_upper,diag([1,1,1,1]), 0), 0.05);
 sys_feedback = feedback(sys, K);
-step(sys_feedback)
+%step(sys_feedback)
+initial(sys_feedback,[0.2,0,0,0])
 
-
+[M,P,Z,E] = lqed(A_upper,diag([1,1,1,1]),[1, 0, 1, 0],diag([1, 1, 1, 1]),10,sampling_time)
 
 
 
