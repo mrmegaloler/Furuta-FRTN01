@@ -29,12 +29,12 @@ public class FurutaRegulator extends Thread {
 
 		double pastTheta = furuta.getThetaAngle();
 		double pastPhi = furuta.getPhiAngle();
-
+		long timeExit = 0;
 		try {
 			while (!Thread.interrupted()) {
 				long t = System.currentTimeMillis();
 				t = t + h;
-				System.out.println(furuta.getPhiAngle());
+				//System.out.println(furuta.getPhiAngle());
 				if (state == STATE.UPPER) {
 					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.01;
 					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
@@ -72,7 +72,7 @@ public class FurutaRegulator extends Thread {
 				if (duration > 0) {
 					sleep(duration);
 				}
-
+				timeExit = System.currentTimeMillis();
 			}
 		} catch (Exception ignored) {
 
