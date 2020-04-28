@@ -8,9 +8,12 @@ public class Main {
 
 	public static void main(String[] args) {
 		SimFurutaPendulum furuta = new SimFurutaPendulum(0, 0);
-		FurutaRegulator regul = new FurutaRegulator(furuta);
-		//PlotterPanel panel = new PlotterPanel(2, 5);
-		//panel.start();
+		RegulatorParameters parameters = new RegulatorParameters();
+		parameters.state = FurutaRegulator.STATE.UPPER;
+		parameters.H = 0.01;
+		FurutaRegulator regul = new FurutaRegulator(furuta,parameters);
+		//GUI gui = new GUI();
+
 
 
 		regul.start();

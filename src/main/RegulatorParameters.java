@@ -1,7 +1,7 @@
 package main;
 
 
-public class PIDParameters implements Cloneable {
+public class RegulatorParameters implements Cloneable {
 	public double K;
 	public double Ti;
 	public double Tr;
@@ -9,7 +9,7 @@ public class PIDParameters implements Cloneable {
 	public double N;
 	public double Beta;
 	public double H;
-	public boolean integratorOn;
+	public FurutaRegulator.STATE state;
 
 	public Object clone() {
 		try {
