@@ -2,7 +2,7 @@ package main;
 
 
 import furuta.SimFurutaPendulum;
-import se.lth.control.plot.PlotterPanel;
+
 
 public class Main {
 
@@ -12,7 +12,7 @@ public class Main {
 		parameters.state = FurutaRegulator.STATE.UPPER;
 		parameters.H = 0.01;
 		FurutaRegulator regul = new FurutaRegulator(furuta,parameters);
-		//GUI gui = new GUI();
+		FurutaGUI gui = new FurutaGUI();
 
 
 
