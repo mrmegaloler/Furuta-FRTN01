@@ -2,14 +2,17 @@ package main;
 
 
 public class RegulatorParameters implements Cloneable {
-	public double K;
-	public double Ti;
-	public double Tr;
-	public double Td;
-	public double N;
-	public double Beta;
+	public double K1;
+	public double K2;
+	public double angleThresholdUpper;
+	public double angleThresholdLower;
+	public double velocityThresholdUpper;
+	public double velocityThresholdLower;
+	public double angleReference;
 	public double H;
-	public FurutaRegulator.STATE state;
+	public STATE state;
+
+	public enum STATE {UPPER, LOWER, OFF}; //Lokalt definierat för att hålla koll på hur vi ska reglera
 
 	public Object clone() {
 		try {

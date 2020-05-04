@@ -13,11 +13,7 @@ public class FurutaRegulator extends Thread {
 	private double x3hat = 0;
 	private double x4hat = 0;
 
-	public enum STATE {UPPER, LOWER, OFF}; //Lokalt definierat för att hålla koll på hur vi ska reglera
 
-
-
-	private STATE state = STATE.UPPER;
 
 	public FurutaRegulator(SimFurutaPendulum furuta, RegulatorParameters parameters) {
 		this.furuta = furuta;
@@ -39,7 +35,7 @@ public class FurutaRegulator extends Thread {
 				long t = System.currentTimeMillis();
 				t = t + h;
 				//System.out.println(furuta.getPhiAngle());
-				if (parameters.state == STATE.UPPER) {
+				if (parameters.state == RegulatorParameters.STATE.UPPER) {
 					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.01;
 					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
 					if (normalizeToPiUpper(furuta.getThetaAngle()) < 0.2 && normalizeToPiUpper(furuta.getThetaAngle()) > -0.15) {
@@ -54,13 +50,13 @@ public class FurutaRegulator extends Thread {
 								* thetaDot * Math.cos(furuta.getThetaAngle())) - 0.02 * phiDot;
 					}
 
-				} else if (parameters.state == STATE.LOWER) {
+				} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
 					//Stabiliseringsalgoritm undre
 					//
 					u = ((furuta.getThetaAngle())) * -3.3079 + (furuta.getThetaDot()) * 0.0788 +
 							((furuta.getPhiAngle())) * -0.8561 + furuta.getPhiDot() * -0.5080;
 
-				} else if (parameters.state == STATE.OFF) {
+				} else if (parameters.state == RegulatorParameters.STATE.OFF) {
 
 					u = 0;
 				}
