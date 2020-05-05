@@ -45,21 +45,21 @@ public class FurutaRegulator extends Thread {
 					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
 					if (normalizeToPiUpper(furuta.getThetaAngle()) < parameters.angleThresholdUpper && normalizeToPiUpper(furuta.getThetaAngle()) > -parameters.angleThresholdUpper) {
 						//Stabiliseringsalgoritm övre
-						//Vi använder styrlagen att u = K*(Xref-X)
+						//Vi använder styrlagen att u = K*(Xref-X) vilket här blir u = -l*x
 						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
-								(parameters.phiReference - ((furuta.getPhiAngle()))) * -0.5988 + phiDot * 0.7628;
+								(parameters.phiReference - ((normalizeToPiPhi(furuta.getPhiAngle())))) * -0.5988 + phiDot * 0.7628;
 					} else {
 						//Swing-up algoritm
 						//Taget från webbsidan
 						u = parameters.K1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
-								* thetaDot * Math.cos(furuta.getThetaAngle())) - parameters.K2 * phiDot;
+								* thetaDot * Math.cos(normalizeToPiUpper(furuta.getThetaAngle()))) - parameters.K2 * phiDot;
 					}
 
 				} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
 					//Stabiliseringsalgoritm undre
 					//
-					u = ((furuta.getThetaAngle())) * -3.3079 + (furuta.getThetaDot()) * 0.0788 +
-							((furuta.getPhiAngle())) * -0.8561 + furuta.getPhiDot() * -0.5080;
+					u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (furuta.getThetaDot()) * 0.0788 +
+							(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + furuta.getPhiDot() * -0.5080;
 
 				} else if (parameters.state == RegulatorParameters.STATE.OFF) {
 
@@ -74,7 +74,7 @@ public class FurutaRegulator extends Thread {
 				}
 				furuta.setControlSignal(u);
 				realTime = realTime + ((double)h)/1000;
-				plotterPanels.addDataPoints(realTime, u, furuta.getThetaAngle(), furuta.getPhiAngle());
+				plotterPanels.addDataPoints(realTime, u, normalizeToPiUpper(furuta.getThetaAngle()), normalizeToPiPhi(furuta.getPhiAngle()));
 
 
 				duration = t - System.currentTimeMillis();
@@ -91,15 +91,45 @@ public class FurutaRegulator extends Thread {
 	}
 
 	public double normalizeToPiUpper(double angle) {
-		if (angle > Math.PI) {
-			angle = (angle % (2 * Math.PI));
-			if (angle > Math.PI) {
-				angle -= 2 * Math.PI;
-			}
+
+		if(parameters.state == RegulatorParameters.STATE.LOWER || parameters.state == RegulatorParameters.STATE.OFF){
+			angle -= Math.PI;
 		}
 
-		return angle;
-	}
+			if (angle > Math.PI) {
+				angle = (angle % (2 * Math.PI));
+				if (angle > Math.PI) {
+					angle -= 2 * Math.PI;
+				}
+			} else if (angle < -Math.PI) {
+				angle = angle % (2 * Math.PI);
+				if (angle < -Math.PI) {
+					angle += 2 * Math.PI;
+				}
+			}
+
+
+
+			return angle;
+		}
+
+		public double normalizeToPiPhi(double angle){
+			if (angle > Math.PI) {
+				angle = (angle % (2 * Math.PI));
+				if (angle > Math.PI) {
+					angle -= 2 * Math.PI;
+				}
+			} else if (angle < -Math.PI) {
+				angle = angle % (2 * Math.PI);
+				if (angle < -Math.PI) {
+					angle += 2 * Math.PI;
+				}
+			}
+
+
+
+			return angle;
+		}
 
 
 }

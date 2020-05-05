@@ -159,7 +159,7 @@ public class FurutaGUI extends JFrame {
                     }
                     parameters.K1 = k1Temp;
                     parameters.K2 = k2Temp;
-                    parameters.phiReference = AngleSlider.getValue()/100;
+                    parameters.phiReference = ((double)AngleSlider.getValue())/100;
                     parameters.angleThresholdLower = Double.parseDouble(angleLowerField.getText());
                     parameters.angleThresholdUpper = Double.parseDouble(angleUpperField.getText());
                     parameters.velocityThresholdLower = Double.parseDouble(velocityLowerField.getText());
