@@ -8,7 +8,7 @@ public class RegulatorParameters implements Cloneable {
 	public double angleThresholdLower;
 	public double velocityThresholdUpper;
 	public double velocityThresholdLower;
-	public double angleReference;
+	public double phiReference;
 	public double H;
 	public STATE state;
 

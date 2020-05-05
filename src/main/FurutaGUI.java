@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 
 public class FurutaGUI extends JFrame {
 
@@ -45,7 +44,10 @@ public class FurutaGUI extends JFrame {
     private JLabel messageField;
 
     private RegulatorParameters parameters;
-    private PlotterPanel plotterPanel;
+    private PlotterPanel uPlotter;
+    private PlotterPanel thetaPlotter;
+    private PlotterPanel phiPlotter;
+
 
 
     public static void main(String[] args) {
@@ -157,7 +159,7 @@ public class FurutaGUI extends JFrame {
                     }
                     parameters.K1 = k1Temp;
                     parameters.K2 = k2Temp;
-                    parameters.angleReference = AngleSlider.getValue()/100;
+                    parameters.phiReference = AngleSlider.getValue()/100;
                     parameters.angleThresholdLower = Double.parseDouble(angleLowerField.getText());
                     parameters.angleThresholdUpper = Double.parseDouble(angleUpperField.getText());
                     parameters.velocityThresholdLower = Double.parseDouble(velocityLowerField.getText());
@@ -196,19 +198,43 @@ public class FurutaGUI extends JFrame {
         JFrame plotter = new JFrame();
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        plotterPanel = new PlotterPanel(2,4);
-        plotterPanel.setBorder(BorderFactory.createEtchedBorder());
-        plotterPanel.setYAxis(2,-1,2,2);
-        plotterPanel.setXAxis(10,5,5);
-        plotterPanel.setColor(1, Color.RED);
-        panel.add(plotterPanel,BorderLayout.CENTER);
-        plotter.setContentPane(panel);
 
+        uPlotter = new PlotterPanel(1,4);
+        uPlotter.setBorder(BorderFactory.createEtchedBorder());
+        uPlotter.setYAxis(2,-1,2,2);
+        uPlotter.setXAxis(10,5,5);
+        uPlotter.setColor(1, Color.RED);
+        panel.add(uPlotter,BorderLayout.NORTH);
+
+        thetaPlotter = new PlotterPanel(1,4);
+        thetaPlotter.setBorder(BorderFactory.createEtchedBorder());
+        thetaPlotter.setYAxis(4*Math.PI,-2*Math.PI,2,2);
+        thetaPlotter.setXAxis(10,5,5);
+        thetaPlotter.setColor(1, Color.BLUE);
+        panel.add(thetaPlotter,BorderLayout.CENTER);
+
+        phiPlotter = new PlotterPanel(2,4);
+        phiPlotter.setBorder(BorderFactory.createEtchedBorder());
+        phiPlotter.setYAxis(4*Math.PI,-2*Math.PI,2,2);
+        phiPlotter.setXAxis(10,5,5);
+        phiPlotter.setColor(1, Color.GREEN);
+        phiPlotter.setColor(2, Color.BLACK);
+        panel.add(phiPlotter,BorderLayout.SOUTH);
+
+        plotter.setContentPane(panel);
         plotter.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        plotter.setSize(700, 450);
+        plotter.pack();
         plotter.setVisible(true);
 
-        plotterPanel.start();
+        uPlotter.start();
+        thetaPlotter.start();
+        phiPlotter.start();
+    }
+
+    public void addDataPoints(double time, double u, double theta, double phi){
+        uPlotter.putData(time, u);
+        thetaPlotter.putData(time, theta);
+        phiPlotter.putData(time, phi, parameters.phiReference);
     }
 
 

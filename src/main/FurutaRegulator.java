@@ -12,19 +12,24 @@ public class FurutaRegulator extends Thread {
 	private double x2hat = 0;
 	private double x3hat = 0;
 	private double x4hat = 0;
+	private double u = 0;
+	private double realTime;
+
+	private FurutaGUI plotterPanels;
 
 
 
-	public FurutaRegulator(SimFurutaPendulum furuta, RegulatorParameters parameters) {
+	public FurutaRegulator(SimFurutaPendulum furuta, RegulatorParameters parameters, FurutaGUI plotterPanels) {
 		this.furuta = furuta;
 		this.parameters = parameters;
+		this.plotterPanels = plotterPanels;
 	}
 
 	public void run() {
 
 		long h = (long) (parameters.H * 1000);
 		long duration;
-		double u = 0;
+
 
 		double pastTheta = furuta.getThetaAngle();
 		double pastPhi = furuta.getPhiAngle();
@@ -38,16 +43,16 @@ public class FurutaRegulator extends Thread {
 				if (parameters.state == RegulatorParameters.STATE.UPPER) {
 					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.01;
 					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
-					if (normalizeToPiUpper(furuta.getThetaAngle()) < 0.2 && normalizeToPiUpper(furuta.getThetaAngle()) > -0.15) {
+					if (normalizeToPiUpper(furuta.getThetaAngle()) < parameters.angleThresholdUpper && normalizeToPiUpper(furuta.getThetaAngle()) > -parameters.angleThresholdUpper) {
 						//Stabiliseringsalgoritm övre
 						//Vi använder styrlagen att u = K*(Xref-X)
 						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
-								(Math.PI/2 - ((furuta.getPhiAngle()))) * -0.5988 + phiDot * 0.7628;
+								(parameters.phiReference - ((furuta.getPhiAngle()))) * -0.5988 + phiDot * 0.7628;
 					} else {
 						//Swing-up algoritm
 						//Taget från webbsidan
-						u = 1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
-								* thetaDot * Math.cos(furuta.getThetaAngle())) - 0.02 * phiDot;
+						u = parameters.K1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
+								* thetaDot * Math.cos(furuta.getThetaAngle())) - parameters.K2 * phiDot;
 					}
 
 				} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
@@ -68,16 +73,9 @@ public class FurutaRegulator extends Thread {
 					u = -1;
 				}
 				furuta.setControlSignal(u);
-				/*
-				double x1hatNew = -0.036*u+0.1376*furuta.getThetaAngle()+0.1376*furuta.getPhiAngle()+0.862*x1hat+0.01*x2hat-0.1376*x3hat;
-				double x2hatNew = -0.7127*u+0.7822*furuta.getThetaAngle()+0.7822*furuta.getPhiAngle()-0.4692*x1hat+1.0016*x2hat-0.7822*x3hat;
-				double x3hatNew = 0.0096*u-0.0194*furuta.getThetaAngle()-0.0194*furuta.getPhiAngle()+0.019371*x1hat+1.0174*x3hat+0.01*x4hat;
-				double x4hatNew = 1.9125*u-0.0241*furuta.getThetaAngle()-0.0241*furuta.getPhiAngle()+0.0182*x1hat+0.0241*x3hat+1*x4hat;
-				x1hat = x1hatNew;
-				x2hat = x2hatNew;
-				x3hat = x3hatNew;
-				x4hat = x4hatNew;
-				*/
+				realTime = realTime + ((double)h)/1000;
+				plotterPanels.addDataPoints(realTime, u, furuta.getThetaAngle(), furuta.getPhiAngle());
+
 
 				duration = t - System.currentTimeMillis();
 				pastTheta = furuta.getThetaAngle();
@@ -103,8 +101,5 @@ public class FurutaRegulator extends Thread {
 		return angle;
 	}
 
-	public void setParameters(RegulatorParameters parameters){
-		this.parameters = parameters;
-	}
 
 }
