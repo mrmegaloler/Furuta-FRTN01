@@ -40,7 +40,6 @@ public class FurutaGUI extends JFrame {
     private JButton resetVTU;
     private JButton resetATL;
     private JButton resetVTL;
-    private JButton ResetAR;
     private JLabel messageField;
 
     private RegulatorParameters parameters;
@@ -204,6 +203,7 @@ public class FurutaGUI extends JFrame {
         uPlotter.setYAxis(2,-1,2,2);
         uPlotter.setXAxis(10,5,5);
         uPlotter.setColor(1, Color.RED);
+        uPlotter.setTitle("Control Signal");
         panel.add(uPlotter,BorderLayout.NORTH);
 
         thetaPlotter = new PlotterPanel(1,4);
@@ -211,6 +211,7 @@ public class FurutaGUI extends JFrame {
         thetaPlotter.setYAxis(4*Math.PI,-2*Math.PI,2,2);
         thetaPlotter.setXAxis(10,5,5);
         thetaPlotter.setColor(1, Color.BLUE);
+        thetaPlotter.setTitle("Theta angle");
         panel.add(thetaPlotter,BorderLayout.CENTER);
 
         phiPlotter = new PlotterPanel(2,4);
@@ -219,6 +220,7 @@ public class FurutaGUI extends JFrame {
         phiPlotter.setXAxis(10,5,5);
         phiPlotter.setColor(1, Color.GREEN);
         phiPlotter.setColor(2, Color.BLACK);
+        phiPlotter.setTitle("Phi angle with reference");
         panel.add(phiPlotter,BorderLayout.SOUTH);
 
         plotter.setContentPane(panel);
