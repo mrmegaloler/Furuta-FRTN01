@@ -2,6 +2,8 @@ package main;
 
 import furuta.SimFurutaPendulum;
 
+import static java.lang.Math.abs;
+
 public class FurutaRegulator extends Thread {
 
 	private RegulatorParameters parameters;
@@ -16,7 +18,6 @@ public class FurutaRegulator extends Thread {
 	private double realTime;
 
 	private FurutaGUI plotterPanels;
-
 
 
 	public FurutaRegulator(SimFurutaPendulum furuta, RegulatorParameters parameters, FurutaGUI plotterPanels) {
@@ -39,11 +40,12 @@ public class FurutaRegulator extends Thread {
 			while (!Thread.interrupted()) {
 				long t = System.currentTimeMillis();
 				t = t + h;
+				double thetaDot = (furuta.getThetaAngle() - pastTheta) / 0.01;
+				double phiDot = (furuta.getPhiAngle() - pastPhi) / 0.01;
 				//System.out.println(furuta.getPhiAngle());
 				if (parameters.state == RegulatorParameters.STATE.UPPER) {
-					double thetaDot = (furuta.getThetaAngle() - pastTheta)/0.01;
-					double phiDot = (furuta.getPhiAngle() - pastPhi)/0.01;
-					if (normalizeToPiUpper(furuta.getThetaAngle()) < parameters.angleThresholdUpper && normalizeToPiUpper(furuta.getThetaAngle()) > -parameters.angleThresholdUpper) {
+
+					if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdUpper && abs(thetaDot) < parameters.velocityThresholdUpper) {
 						//Stabiliseringsalgoritm övre
 						//Vi använder styrlagen att u = K*(Xref-X) vilket här blir u = -l*x
 						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
@@ -57,10 +59,13 @@ public class FurutaRegulator extends Thread {
 
 				} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
 					//Stabiliseringsalgoritm undre
-					//
-					u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (furuta.getThetaDot()) * 0.0788 +
-							(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + furuta.getPhiDot() * -0.5080;
-
+					if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdLower && abs(thetaDot) < parameters.velocityThresholdLower) {
+						u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (thetaDot) * 0.0788 +
+								(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + phiDot * -0.5080;
+					}
+					else{
+						u = 0;
+					}
 				} else if (parameters.state == RegulatorParameters.STATE.OFF) {
 
 					u = 0;
@@ -73,7 +78,7 @@ public class FurutaRegulator extends Thread {
 					u = -1;
 				}
 				furuta.setControlSignal(u);
-				realTime = realTime + ((double)h)/1000;
+				realTime = realTime + ((double) h) / 1000;
 				plotterPanels.addDataPoints(realTime, u, normalizeToPiUpper(furuta.getThetaAngle()), normalizeToPiPhi(furuta.getPhiAngle()));
 
 
@@ -92,44 +97,42 @@ public class FurutaRegulator extends Thread {
 
 	public double normalizeToPiUpper(double angle) {
 
-		if(parameters.state == RegulatorParameters.STATE.LOWER || parameters.state == RegulatorParameters.STATE.OFF){
+		if (parameters.state == RegulatorParameters.STATE.LOWER || parameters.state == RegulatorParameters.STATE.OFF) {
 			angle -= Math.PI;
 		}
 
+		if (angle > Math.PI) {
+			angle = (angle % (2 * Math.PI));
 			if (angle > Math.PI) {
-				angle = (angle % (2 * Math.PI));
-				if (angle > Math.PI) {
-					angle -= 2 * Math.PI;
-				}
-			} else if (angle < -Math.PI) {
-				angle = angle % (2 * Math.PI);
-				if (angle < -Math.PI) {
-					angle += 2 * Math.PI;
-				}
+				angle -= 2 * Math.PI;
 			}
-
-
-
-			return angle;
+		} else if (angle < -Math.PI) {
+			angle = angle % (2 * Math.PI);
+			if (angle < -Math.PI) {
+				angle += 2 * Math.PI;
+			}
 		}
 
-		public double normalizeToPiPhi(double angle){
+
+		return angle;
+	}
+
+	public double normalizeToPiPhi(double angle) {
+		if (angle > Math.PI) {
+			angle = (angle % (2 * Math.PI));
 			if (angle > Math.PI) {
-				angle = (angle % (2 * Math.PI));
-				if (angle > Math.PI) {
-					angle -= 2 * Math.PI;
-				}
-			} else if (angle < -Math.PI) {
-				angle = angle % (2 * Math.PI);
-				if (angle < -Math.PI) {
-					angle += 2 * Math.PI;
-				}
+				angle -= 2 * Math.PI;
 			}
-
-
-
-			return angle;
+		} else if (angle < -Math.PI) {
+			angle = angle % (2 * Math.PI);
+			if (angle < -Math.PI) {
+				angle += 2 * Math.PI;
+			}
 		}
+
+
+		return angle;
+	}
 
 
 }
