@@ -61,7 +61,7 @@ public class FurutaGUI extends JFrame {
 
 		plotter();
 
-		JFrame frame = new JFrame("furutaGUI");
+		JFrame frame = new JFrame("Parameters and Control");
 		frame.setContentPane(mainPanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(700, 450);
