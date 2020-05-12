@@ -40,44 +40,44 @@ public class FurutaRegulator extends Thread {
 			while (!Thread.interrupted()) {
 				long t = System.currentTimeMillis();
 				t = t + h;
-				double thetaDot = (furuta.getThetaAngle() - pastTheta) / 0.01;
-				double phiDot = (furuta.getPhiAngle() - pastPhi) / 0.01;
-				//System.out.println(furuta.getPhiAngle());
-				if (parameters.state == RegulatorParameters.STATE.UPPER) {
+				double thetaDot = (furuta.getThetaAngle() - pastTheta) / parameters.H;
+				double phiDot = (furuta.getPhiAngle() - pastPhi) / parameters.H;
+				synchronized (parameters) {
+					if (parameters.state == RegulatorParameters.STATE.UPPER) {
 
-					if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdUpper && abs(thetaDot) < parameters.velocityThresholdUpper) {
-						//Stabiliseringsalgoritm övre
-						//Vi använder styrlagen att u = K*(Xref-X) vilket här blir u = -l*x
-						u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
-								(parameters.phiReference - ((normalizeToPiPhi(furuta.getPhiAngle())))) * -0.5988 + phiDot * 0.7628;
-					} else {
-						//Swing-up algoritm
-						//Taget från webbsidan
-						u = parameters.K1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
-								* thetaDot * Math.cos(normalizeToPiUpper(furuta.getThetaAngle()))) - parameters.K2 * phiDot;
-					}
+						if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdUpper && abs(thetaDot) < parameters.velocityThresholdUpper) {
+							//Stabiliseringsalgoritm övre
+							//Vi använder styrlagen att u = K*(Xref-X) vilket här blir u = -l*x
+							u = (0 - (normalizeToPiUpper(furuta.getThetaAngle()))) * -20.17 + (thetaDot) * 3.7153 +
+									(parameters.phiReference - ((normalizeToPiPhi(furuta.getPhiAngle())))) * -0.5988 + phiDot * 0.7628;
+						} else {
+							//Swing-up algoritm
+							//Taget från webbsidan
+							u = parameters.K1 * Math.signum(((Math.cos(furuta.getThetaAngle()) + (Math.pow(thetaDot, 2) / (2 * Math.pow(6.7, 2)))) - 1)
+									* thetaDot * Math.cos(normalizeToPiUpper(furuta.getThetaAngle()))) - parameters.K2 * phiDot;
+						}
 
-				} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
-					//Stabiliseringsalgoritm undre
-					if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdLower && abs(thetaDot) < parameters.velocityThresholdLower) {
-						u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (thetaDot) * 0.0788 +
-								(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + phiDot * -0.5080;
-					}
-					else{
+					} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
+						//Stabiliseringsalgoritm undre
+						if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdLower && abs(thetaDot) < parameters.velocityThresholdLower) {
+							u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (thetaDot) * 0.0788 +
+									(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + phiDot * -0.5080;
+						} else {
+							u = 0;
+						}
+					} else if (parameters.state == RegulatorParameters.STATE.OFF) {
+
 						u = 0;
 					}
-				} else if (parameters.state == RegulatorParameters.STATE.OFF) {
 
-					u = 0;
+
+					if (u > 1) {
+						u = 1;
+					} else if (u < -1) {
+						u = -1;
+					}
+					furuta.setControlSignal(u);
 				}
-
-
-				if (u > 1) {
-					u = 1;
-				} else if (u < -1) {
-					u = -1;
-				}
-				furuta.setControlSignal(u);
 				realTime = realTime + ((double) h) / 1000;
 				plotterPanels.addDataPoints(realTime, u, normalizeToPiUpper(furuta.getThetaAngle()), normalizeToPiPhi(furuta.getPhiAngle()));
 

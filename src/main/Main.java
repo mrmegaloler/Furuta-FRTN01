@@ -15,9 +15,9 @@ public class Main {
 		parameters.K1 = 1;
 		parameters.K2 = 0.02;
 		parameters.velocityThresholdUpper = 1;
-		parameters.velocityThresholdLower = 8;
+		parameters.velocityThresholdLower = 5;
 		parameters.angleThresholdUpper = 0.3;
-		parameters.angleThresholdLower = 0.5;
+		parameters.angleThresholdLower = 0.4;
 
 		FurutaGUI gui = new FurutaGUI(parameters);
 		FurutaRegulator regul = new FurutaRegulator(furuta,parameters,gui);
