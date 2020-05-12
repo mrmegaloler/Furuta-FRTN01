@@ -60,8 +60,8 @@ public class FurutaRegulator extends Thread {
 					} else if (parameters.state == RegulatorParameters.STATE.LOWER) {
 						//Stabiliseringsalgoritm undre
 						if (abs(normalizeToPiUpper(furuta.getThetaAngle())) < parameters.angleThresholdLower && abs(thetaDot) < parameters.velocityThresholdLower) {
-							u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -3.3079 + (thetaDot) * 0.0788 +
-									(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + phiDot * -0.5080;
+							u = ((normalizeToPiUpper(furuta.getThetaAngle()))) * -2.9879 + (thetaDot) * -0.0132 +
+									(parameters.phiReference - normalizeToPiPhi(furuta.getPhiAngle())) * 0.8561 + phiDot * -0.5969;
 						} else {
 							u = 0;
 						}
