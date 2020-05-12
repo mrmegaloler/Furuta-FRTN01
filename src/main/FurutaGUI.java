@@ -193,7 +193,7 @@ public class FurutaGUI extends JFrame {
 	}
 
 	private void plotter() {
-		JFrame plotter = new JFrame();
+		JFrame plotter = new JFrame("Signal Plots");
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 
