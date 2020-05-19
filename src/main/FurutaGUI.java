@@ -78,7 +78,7 @@ public class FurutaGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				synchronized (parameters) {
-					parameters.state = RegulatorParameters.STATE.OFF;
+					parameters.setState(RegulatorParameters.STATE.OFF);
 				}
 			}
 		});
@@ -87,7 +87,7 @@ public class FurutaGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				synchronized (parameters) {
-					parameters.state = RegulatorParameters.STATE.UPPER;
+					parameters.setState(RegulatorParameters.STATE.UPPER);
 				}
 			}
 		});
@@ -96,7 +96,7 @@ public class FurutaGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				synchronized (parameters) {
-					parameters.state = RegulatorParameters.STATE.LOWER;
+					parameters.setState(RegulatorParameters.STATE.LOWER);
 				}
 			}
 		});
@@ -105,41 +105,41 @@ public class FurutaGUI extends JFrame {
 		resetK1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				k1Field.setText(Double.toString(parameters.K1));
+				k1Field.setText(Double.toString(parameters.getK1()));
 			}
 		});
 		resetK2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				k2Field.setText(Double.toString(parameters.K2));
+				k2Field.setText(Double.toString(parameters.getK2()));
 			}
 		});
 
 		resetATL.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				angleLowerField.setText(Double.toString(parameters.angleThresholdLower));
+				angleLowerField.setText(Double.toString(parameters.getAngleThresholdLower()));
 			}
 		});
 
 		resetATU.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				angleUpperField.setText(Double.toString(parameters.angleThresholdUpper));
+				angleUpperField.setText(Double.toString(parameters.getAngleThresholdUpper()));
 			}
 		});
 
 		resetVTL.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				velocityLowerField.setText(Double.toString(parameters.velocityThresholdLower));
+				velocityLowerField.setText(Double.toString(parameters.getAngleThresholdLower()));
 			}
 		});
 
 		resetVTU.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				velocityUpperField.setText(Double.toString(parameters.velocityThresholdUpper));
+				velocityUpperField.setText(Double.toString(parameters.getVelocityThresholdUpper()));
 			}
 		});
 
@@ -155,14 +155,14 @@ public class FurutaGUI extends JFrame {
 					if (k2Temp > 1 || k2Temp < 0) {
 						throw new NumberFormatException("k2 needs to be between 1 and 0");
 					}
-					parameters.K1 = k1Temp;
-					parameters.K2 = k2Temp;
+					parameters.setK1(k1Temp);
+					parameters.setK2(k2Temp);
 					synchronized (parameters) {
-                        parameters.phiReference = ((double) AngleSlider.getValue()) / 100;
-                        parameters.angleThresholdLower = Double.parseDouble(angleLowerField.getText());
-                        parameters.angleThresholdUpper = Double.parseDouble(angleUpperField.getText());
-                        parameters.velocityThresholdLower = Double.parseDouble(velocityLowerField.getText());
-                        parameters.velocityThresholdUpper = Double.parseDouble(velocityUpperField.getText());
+                        parameters.setPhiReference(((double) AngleSlider.getValue()) / 100);
+                        parameters.setAngleThresholdLower(Double.parseDouble(angleLowerField.getText()));
+                        parameters.setAngleThresholdLower(Double.parseDouble(angleUpperField.getText()));
+                        parameters.setVelocityThresholdLower(Double.parseDouble(velocityLowerField.getText()));
+                        parameters.setVelocityThresholdUpper(Double.parseDouble(velocityUpperField.getText()));
                         messageField.setText("Parameters set successfully");
                         setFieldParameters();
                     }
@@ -184,12 +184,12 @@ public class FurutaGUI extends JFrame {
 		symbols.setGroupingSeparator(',');
 		df.setDecimalFormatSymbols(symbols);
 
-		angleUpperField.setText(Double.toString(parameters.angleThresholdUpper));
-		angleLowerField.setText(String.valueOf(parameters.angleThresholdLower));
-		velocityLowerField.setText(String.valueOf(parameters.velocityThresholdLower));
-		velocityUpperField.setText(String.valueOf(parameters.velocityThresholdUpper));
-		k1Field.setText(String.valueOf(parameters.K1));
-		k2Field.setText(String.valueOf(parameters.K2));
+		angleUpperField.setText(Double.toString(parameters.getVelocityThresholdUpper()));
+		angleLowerField.setText(String.valueOf(parameters.getAngleThresholdLower()));
+		velocityLowerField.setText(String.valueOf(parameters.getVelocityThresholdLower()));
+		velocityUpperField.setText(String.valueOf(parameters.getVelocityThresholdUpper()));
+		k1Field.setText(String.valueOf(parameters.getK1()));
+		k2Field.setText(String.valueOf(parameters.getK2()));
 	}
 
 	private void plotter() {
@@ -235,7 +235,7 @@ public class FurutaGUI extends JFrame {
 	public void addDataPoints(double time, double u, double theta, double phi) {
 		uPlotter.putData(time, u);
 		thetaPlotter.putData(time, theta);
-		phiPlotter.putData(time, phi, parameters.phiReference);
+		phiPlotter.putData(time, phi, parameters.getPhiReference());
 	}
 
 

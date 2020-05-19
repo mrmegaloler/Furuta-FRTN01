@@ -10,14 +10,14 @@ public class Main {
 		SimFurutaPendulum furuta = new SimFurutaPendulum(Math.PI, 0);
 		RegulatorParameters parameters = new RegulatorParameters();
 
-		parameters.state = RegulatorParameters.STATE.OFF;
-		parameters.H = 0.01;
-		parameters.K1 = 1;
-		parameters.K2 = 0.02;
-		parameters.velocityThresholdUpper = 1;
-		parameters.velocityThresholdLower = 5;
-		parameters.angleThresholdUpper = 0.3;
-		parameters.angleThresholdLower = 0.4;
+		parameters.setState(RegulatorParameters.STATE.OFF);
+		parameters.setH(0.01);
+		parameters.setK1(1);
+		parameters.setK2(0.02);
+		parameters.setVelocityThresholdUpper(1);
+		parameters.setVelocityThresholdLower(5);
+		parameters.setAngleThresholdUpper(0.3);
+		parameters.setAngleThresholdLower(0.4);
 
 		FurutaGUI gui = new FurutaGUI(parameters);
 		FurutaRegulator regul = new FurutaRegulator(furuta,parameters,gui);
