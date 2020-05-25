@@ -1,7 +1,7 @@
 package main;
 
 
-public class RegulatorParameters implements Cloneable {
+public class RegulatorParameters {
 	private double K1;
 	private double K2;
 	private double angleThresholdUpper;
@@ -86,12 +86,4 @@ public class RegulatorParameters implements Cloneable {
 		this.state = state;
 	}
 
-
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException x) {
-			return null;
-		}
-	}
 }

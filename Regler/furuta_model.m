@@ -8,7 +8,7 @@ J = 0.05;
 m = 0.02;
 g = 9.81;
 
-sampling_time = 0.05;
+sampling_time = 0.01;
 
 alfa = Jp+M*l^2;
 beta = J+M*r^2+m*r^2;
@@ -41,7 +41,7 @@ A_lower = [-friction 1 0 0;
 B_lower = [0 gamma/(alfa*beta-gamma^2)*g 0 alfa/(alfa*beta-gamma^2)*g]';
 
 %code for generating the lqr filter
-[K,S,E] = lqrd(A_upper,B_upper,Q,R,sampling_time)
+[K,S,E] = lqrd(A_lower,B_lower,Q,R,sampling_time)
 
 %code to check the poles generated
 %g = zpk(1,[E(1,1),E(2,1),E(3,1),E(4,1)],1,0.01);
